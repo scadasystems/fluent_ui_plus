@@ -750,12 +750,15 @@ class _ComboBoxItemContainer extends StatelessWidget {
   const _ComboBoxItemContainer({
     super.key,
     required this.child,
+    this.height,
   });
 
   /// The widget below this widget in the tree.
   ///
   /// Typically a [Text] widget.
   final Widget child;
+
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -772,9 +775,10 @@ class _ComboBoxItemContainer extends StatelessWidget {
                 : theme.resources.textFillColorPrimary;
 
     return Container(
-      height: hasPadding
-          ? kComboBoxItemHeight
-          : kComboBoxItemHeight - _kMenuItemBottomPadding,
+      height: height ??
+          (hasPadding
+              ? kComboBoxItemHeight
+              : kComboBoxItemHeight - _kMenuItemBottomPadding),
       alignment: AlignmentDirectional.centerStart,
       child: DefaultTextStyle.merge(
         style: TextStyle(color: foregroundColor),
@@ -814,6 +818,7 @@ class ComboBoxItem<T> extends _ComboBoxItemContainer {
     this.onTap,
     this.value,
     this.enabled = true,
+    super.height,
     required super.child,
   });
 
@@ -904,6 +909,8 @@ class ComboBox<T> extends StatefulWidget {
     this.popupColor,
     // When adding new arguments, consider adding similar arguments to
     // ComboBoxFormField.
+    this.padding,
+    this.buttonStyle,
   });
 
   /// The list of items the user can select.
@@ -1091,6 +1098,9 @@ class ComboBox<T> extends StatefulWidget {
   ///
   /// If it is not provided, the default [Acrylic] color is used.
   final Color? popupColor;
+
+  final EdgeInsetsGeometry? padding;
+  final ButtonStyle? buttonStyle;
 
   @override
   State<ComboBox<T>> createState() => ComboBoxState<T>();
@@ -1317,7 +1327,8 @@ class ComboBoxState<T> extends State<ComboBox<T>> {
                 color: theme.resources.textFillColorDisabled,
               ),
         child: Container(
-          padding: padding.resolve(Directionality.of(context)),
+          padding:
+              widget.padding ?? padding.resolve(Directionality.of(context)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.min,
@@ -1350,8 +1361,9 @@ class ComboBoxState<T> extends State<ComboBox<T>> {
           onPressed: isEnabled ? openPopup : null,
           autofocus: widget.autofocus,
           focusNode: focusNode,
-          style: const ButtonStyle(
-              padding: WidgetStatePropertyAll(EdgeInsets.zero)),
+          style: widget.buttonStyle ??
+              const ButtonStyle(
+                  padding: WidgetStatePropertyAll(EdgeInsets.zero)),
           child: result,
         ),
       ),
