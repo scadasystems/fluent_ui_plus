@@ -201,6 +201,8 @@ class TextBox extends StatefulWidget {
     this.contextMenuBuilder = _defaultContextMenuBuilder,
     this.spellCheckConfiguration,
     this.magnifierConfiguration,
+    this.minHeight = 32.0,
+    this.enableHighlight = true,
   })  : assert(obscuringCharacter.length == 1),
         smartDashesType = smartDashesType ??
             (obscureText ? SmartDashesType.disabled : SmartDashesType.enabled),
@@ -612,6 +614,9 @@ class TextBox extends StatefulWidget {
   /// {@macro flutter.widgets.undoHistory.controller}
   final UndoHistoryController? undoController;
 
+  final double minHeight;
+  final bool enableHighlight;
+
   @override
   State<TextBox> createState() => _TextBoxState();
 
@@ -936,6 +941,7 @@ class _TextBoxState extends State<TextBox>
       child: editableText,
       builder: (BuildContext context, TextEditingValue text, Widget? child) {
         final bool hasText = text.text.isNotEmpty;
+
         final String? placeholderText = widget.placeholder;
         final Widget? placeholder = placeholderText == null
             ? null
@@ -997,6 +1003,7 @@ class _TextBoxState extends State<TextBox>
               ),
             ),
             if (suffixWidget != null) suffixWidget,
+            const SizedBox(width: 4),
           ],
         );
       },
@@ -1295,6 +1302,10 @@ class _TextBoxState extends State<TextBox>
               final foregroundDecoration =
                   WidgetStateProperty.resolveWith((states) {
                 if (states.isFocused) {
+                  if (!widget.enableHighlight) {
+                    return const BoxDecoration();
+                  }
+
                   return BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
@@ -1302,11 +1313,15 @@ class _TextBoxState extends State<TextBox>
                             themeData.accentColor.defaultBrushFor(
                               themeData.brightness,
                             ),
-                        width: 2,
+                        width: widget.highlightColor == null ? 2 : 0,
                       ),
                     ),
                   );
                 } else if (enabled) {
+                  if (!widget.enableHighlight) {
+                    return const BoxDecoration();
+                  }
+
                   return BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
@@ -1340,8 +1355,9 @@ class _TextBoxState extends State<TextBox>
                   decoration: decoration,
                   child: Container(
                     foregroundDecoration: foregroundDecoration,
-                    constraints: const BoxConstraints(
-                      minHeight: 32.0,
+                    constraints: BoxConstraints(
+                      minHeight: widget.minHeight,
+                      // minHeight: 32.0,
                     ),
                     child:
                         _selectionGestureDetectorBuilder.buildGestureDetector(
