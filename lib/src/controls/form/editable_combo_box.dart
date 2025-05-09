@@ -37,6 +37,12 @@ class EditableComboBox<T> extends ComboBox<T> {
     this.inputFormatters,
     // When adding new arguments, consider adding similar arguments to
     // EditableComboboxFormField.
+    super.padding,
+    this.enableHighlight = true,
+    this.minHeight = 32.0,
+    this.decoration,
+    this.foregroundDecoration,
+    this.prefix,
   });
 
   /// Called when the text field text is submitted
@@ -79,6 +85,12 @@ class EditableComboBox<T> extends ComboBox<T> {
 
   /// {@macro flutter.widgets.editableText.inputFormatters}
   final List<TextInputFormatter>? inputFormatters;
+
+  final bool enableHighlight;
+  final double minHeight;
+  final WidgetStateProperty<BoxDecoration>? decoration;
+  final WidgetStateProperty<BoxDecoration>? foregroundDecoration;
+  final Widget? prefix;
 
   @override
   State<ComboBox<T>> createState() => _EditableComboboxState<T>();
@@ -174,9 +186,18 @@ class _EditableComboboxState<T> extends ComboBoxState<T> {
         controller: controller,
         expands: widget.isExpanded,
         enabled: isEnabled,
+        decoration: widget.decoration,
+        foregroundDecoration: widget.foregroundDecoration,
+        textAlignVertical: TextAlignVertical.center,
+        highlightColor: widget.enableHighlight ? null : Colors.transparent,
         unfocusedColor: Colors.transparent,
+        padding: widget.padding ?? kTextBoxPadding,
+        minHeight: widget.minHeight,
+        prefix: widget.prefix,
         suffix: Builder(builder: (context) {
           return IconButton(
+            style: const ButtonStyle(
+                padding: WidgetStatePropertyAll(EdgeInsets.all(5))),
             icon: IconTheme.merge(
               data: IconThemeData(
                 color: iconColor(context),
